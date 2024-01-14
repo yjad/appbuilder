@@ -1,2 +1,7 @@
-/contacts
-/venv
+*.pyc
+app.db
+./tmp
+./build/*
+__pycache__
+venv
+*.bak
