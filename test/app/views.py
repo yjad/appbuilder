@@ -5,7 +5,8 @@ from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
 from flask_appbuilder.charts.views import GroupByChartView
 from flask_appbuilder.models.group import aggregate_count
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-from flask import g, flash, abort # current user
+from flask import g, flash, abort, redirect, send_file # current user
+from flask_appbuilder.actions import action
 
 from . import appbuilder, db
 from .models import Contact, ContactGroup, Gender, Student, Status, Semester, Level, Teller
@@ -13,13 +14,14 @@ from wtforms.fields import StringField
 
 
 def voucher_print(rec):
-    
+     
     if rec.db_cr == 'Cr':
         print ('credit Voucher:', vars(rec))
 
-        print ('trx code:', rec.trx_code_desc.trx_code)
-        print ('trx amount:', rec.amount)
-
+        # print ('trx code:', rec.trx_code_desc.trx_code)
+        # print ('trx amount:', rec.amount)
+    file_name  = r"C:\Users\yahia\Downloads\TAX ID.pdf"
+    return file_name
         
 
 def fill_gender():
@@ -266,7 +268,20 @@ class TellerModelView(ModelView):
     def post_add(self, rec: Any):
         print ("=========Printing ==== from post_add", '\n', vars(rec))
         voucher_print(rec)
+        file_name = r"C:\Users\yahia\Downloads\TAX ID.pdf"
+        return send_file(file_name)
            
+    @action("print_voucher", "rePrint", "Reprint?", "fa-print")
+    def print_voucher(self, items):
+        if isinstance(items, list): # called from list
+            # self.datamodel.delete_all(items)
+            # self.update_redirect()
+            pass    # do nothing 
+        else:
+            voucher_print(items)
+        file_name = r"C:\Users\yahia\Downloads\TAX ID.pdf"
+        return send_file(file_name)
+        # return redirect(self.get_redirect())
 
 class RegFeesTellerModelView(TellerModelView):
     datamodel = SQLAInterface(Teller)
@@ -279,6 +294,7 @@ class RegFeesTellerModelView(TellerModelView):
     #     ("", {"fields": ['trx_id','student_name','level','semester','amount','description']}),
     # ]
 
+    base_permissions = ['can_add','can_list']   # remove edit button for trx.
     add_title = 'Collect Registeration Fees'
     # list_title = 'Collect Registeration Fees'
     # show_title = 'Collect Registeration Fees'
@@ -287,7 +303,7 @@ class RegFeesTellerModelView(TellerModelView):
         rec.user_id = g.user.id         # g is the current user record
         rec.db_cr = 'Cr'
         rec.trx_code = 100
-        print (vars(rec))
+        # print (vars(rec))
             
     """
     base_order = ("semester_no", "asc")
@@ -320,11 +336,11 @@ class CrTellerModelView(TellerModelView):
     add_title = 'Collect payment'
     # list_title = 'Collect Registeration Fees'
     # show_title = 'Collect Registeration Fees'
-    def pre_add(self, rec: Any) -> None:
-        print (vars(rec))
-        rec.user_id = g.user.id         # g is the current user record
-        rec.db_cr = 'Cr'
-        print (vars(rec))
+    # def pre_add(self, rec: Any) -> None:
+    #     print (vars(rec))
+    #     rec.user_id = g.user.id         # g is the current user record
+    #     rec.db_cr = 'Cr'
+        
 
 # ----------------------------    
 db.create_all()
