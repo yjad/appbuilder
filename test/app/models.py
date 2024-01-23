@@ -87,7 +87,7 @@ class Country(Model):
     country = Column(String(20))
     alpha_2_code = Column(String(2))
     alpha_3_code = Column(CHAR(3), primary_key=True)
-    numeric = Column(Integer)
+    un_code = Column(Integer)
     country_ar = Column(String(20))
     # student_country = relationship('Student', backref='student_country', lazy=True)
 

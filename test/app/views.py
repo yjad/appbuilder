@@ -5,7 +5,8 @@ from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
 from flask_appbuilder.charts.views import GroupByChartView
 from flask_appbuilder.models.group import aggregate_count
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-from flask import g, flash, abort # current user
+from flask import g, flash, abort, redirect # current user
+from flask_appbuilder.actions import action
 
 from . import appbuilder, db
 from .models import Contact, ContactGroup, Gender, Student, Status, Semester, Level, Teller
@@ -17,8 +18,8 @@ def voucher_print(rec):
     if rec.db_cr == 'Cr':
         print ('credit Voucher:', vars(rec))
 
-        print ('trx code:', rec.trx_code_desc.trx_code)
-        print ('trx amount:', rec.amount)
+        # print ('trx code:', rec.trx_code_desc.trx_code)
+        # print ('trx amount:', rec.amount)
 
         
 
@@ -267,6 +268,15 @@ class TellerModelView(ModelView):
         print ("=========Printing ==== from post_add", '\n', vars(rec))
         voucher_print(rec)
            
+    @action("print_voucher", "Print", "Reprint?", "fa-printer")
+    def print_voucher(self, items):
+        if isinstance(items, list): # called from list
+            # self.datamodel.delete_all(items)
+            # self.update_redirect()
+            pass    # do nothing 
+        else:
+            voucher_print(items)
+        return redirect(self.get_redirect())
 
 class RegFeesTellerModelView(TellerModelView):
     datamodel = SQLAInterface(Teller)
