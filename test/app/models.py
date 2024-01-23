@@ -1,8 +1,9 @@
 import datetime
 
 from flask_appbuilder import Model
-from sqlalchemy import Column, Date, ForeignKey, Integer, String, DateTime, CHAR
+from sqlalchemy import Column, Date, ForeignKey, Integer, String, DateTime, CHAR, Numeric
 from sqlalchemy.orm import relationship
+from flask_appbuilder.security.sqla.models import User
 
 mindate = datetime.date(datetime.MINYEAR, 1, 1)
 
@@ -65,8 +66,8 @@ class Student(Model):
     # gender = Column(CHAR(), nullable = False, default = 'M')
     gender_id = Column(Integer, ForeignKey("gender.id"), nullable=False)
     gender = relationship("Gender")
-    phone_no = Column(String(20), nullable=False)
-    whats_up = Column(String(20), nullable=True)
+    phone_no = Column(String(11), nullable=False)
+    whats_up = Column(String(11), nullable=True)
     address = Column(String(200), nullable=False)
     district = Column(String(20), nullable=True)
     street_name = Column(String(20), nullable=True)
@@ -76,12 +77,10 @@ class Student(Model):
     how_did_know = Column(String(20), nullable=True)
     status_id = Column(Integer, ForeignKey('status.id'), nullable=False, default=1) 
     status = relationship("Status")
-    # status = Column(String(20), default='Active')
-
-    add_dt = Column(DateTime(), nullable = False, default = datetime.datetime.utcnow())
+    add_dt = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return self.name
+        return f"{self.id:04d}-{self.name}"
     
 class Country(Model):
     id = Column(Integer)
@@ -94,3 +93,61 @@ class Country(Model):
 
     def __repr__(self):
         return f"{self.country}"
+    
+
+class Semester(Model):
+    id	        = Column(Integer, unique = True, nullable=False, primary_key=True)
+    semester_no	= Column(CHAR(5), unique = True, nullable=False)
+    description	= Column(String(20), nullable=False)
+    book_start_date	= Column(Date(), nullable=False)
+    exam_start_date	= Column(Date(), nullable=True)
+    exam_end_date	= Column(Date(), nullable=True)
+    status_id = Column(Integer, ForeignKey('status.id'), nullable=False, default=1) 
+    status = relationship("Status")
+    create_date = Column(Date(), nullable = False, default = datetime.date.today())
+
+    def __repr__(self):
+        return f"{self.id:02d}- {self.description}"
+
+class Level(Model):
+    id = Column(CHAR(2), primary_key=True, unique=True, nullable=False)
+    level = Column(String(50),nullable=False)
+
+    def __repr__(self):
+        return self.level
+    
+
+class Teller(Model):
+    trx_id	= Column(Integer, primary_key=True)
+    user_id	= Column(Integer, ForeignKey('ab_user.id'))
+    user_name = relationship("User", primaryjoin="Teller.user_id == User.id")
+    trx_date	= Column(DateTime(), nullable=False, default=datetime.datetime.now())
+    amount	= Column(Numeric, nullable=False)
+    db_cr	= Column(CHAR(2)) #, default=TrxCode.get_trx_code_db_cr())
+    trx_code	= Column(Integer, ForeignKey('trx_code.trx_code'), nullable=False) 
+    trx_code_desc = relationship("TrxCode")
+    description	= Column(String(40))
+    reversed	= Column(CHAR(1), default=0)
+    reverse_date	= Column(DateTime)
+    student_id	= Column(Integer, ForeignKey('student.id'), nullable=False) 
+    student_name = relationship("Student")
+
+    level_id = Column(CHAR(2), ForeignKey('level.id'), nullable=False)
+    level = relationship("Level")
+
+    semester_no = Column(CHAR(5), ForeignKey('semester.id'), nullable=False) 
+    semester = relationship("Semester")
+
+    payee	= Column(String(20))
+
+    def __repr__(self):
+        return f"[Trx {self.trx_id}, {self.user_id}, {self.trx_date} {self.amount} {self.trx_code} {self.db_cr}]"
+    
+
+class TrxCode(Model):
+    trx_code = Column(Integer, primary_key=True)
+    description = Column(String(40))
+    db_cr = Column(CHAR(2))
+
+    def __repr__(self):
+        return f"{self.db_cr}{self.trx_code}- {self.description}"

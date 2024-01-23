@@ -1,2 +1,2 @@
 cd test
-flask run
+flask run --reload

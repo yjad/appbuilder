@@ -69,6 +69,7 @@ BABEL_DEFAULT_LOCALE = "en"
 BABEL_DEFAULT_FOLDER = "translations"
 # The allowed translation for you app
 LANGUAGES = {
+    "ar": {"flag": "ar", "name": "Arabic"},
     "en": {"flag": "gb", "name": "English"},
     "pt": {"flag": "pt", "name": "Portuguese"},
     "pt_BR": {"flag": "br", "name": "Pt Brazil"},
@@ -108,3 +109,5 @@ IMG_UPLOAD_URL = "/static/uploads/"
 # APP_THEME = "spacelab.css"
 # APP_THEME = "united.css"
 # APP_THEME = "yeti.css"
+
+SQLALCHEMY_TRACK_MODIFICATIONS = False
