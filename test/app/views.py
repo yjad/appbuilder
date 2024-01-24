@@ -5,11 +5,7 @@ from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
 from flask_appbuilder.charts.views import GroupByChartView
 from flask_appbuilder.models.group import aggregate_count
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-<<<<<<< HEAD
 from flask import g, flash, abort, redirect, send_file # current user
-=======
-from flask import g, flash, abort, redirect # current user
->>>>>>> 1dbcd4ce0a22d059543cb5d0db7c7b25c5c72957
 from flask_appbuilder.actions import action
 
 from . import appbuilder, db
@@ -24,12 +20,8 @@ def voucher_print(rec):
 
         # print ('trx code:', rec.trx_code_desc.trx_code)
         # print ('trx amount:', rec.amount)
-<<<<<<< HEAD
     file_name  = r"C:\Users\yahia\Downloads\TAX ID.pdf"
     return file_name
-=======
-
->>>>>>> 1dbcd4ce0a22d059543cb5d0db7c7b25c5c72957
         
 
 def fill_gender():
@@ -275,15 +267,11 @@ class TellerModelView(ModelView):
 
     def post_add(self, rec: Any):
         print ("=========Printing ==== from post_add", '\n', vars(rec))
-        voucher_print(rec)
+        # voucher_print(rec)
         file_name = r"C:\Users\yahia\Downloads\TAX ID.pdf"
-        return send_file(file_name)
+        return send_file(file_name) # didnt work.
            
-<<<<<<< HEAD
     @action("print_voucher", "rePrint", "Reprint?", "fa-print")
-=======
-    @action("print_voucher", "Print", "Reprint?", "fa-printer")
->>>>>>> 1dbcd4ce0a22d059543cb5d0db7c7b25c5c72957
     def print_voucher(self, items):
         if isinstance(items, list): # called from list
             # self.datamodel.delete_all(items)
@@ -291,13 +279,9 @@ class TellerModelView(ModelView):
             pass    # do nothing 
         else:
             voucher_print(items)
-<<<<<<< HEAD
         file_name = r"C:\Users\yahia\Downloads\TAX ID.pdf"
         return send_file(file_name)
         # return redirect(self.get_redirect())
-=======
-        return redirect(self.get_redirect())
->>>>>>> 1dbcd4ce0a22d059543cb5d0db7c7b25c5c72957
 
 class RegFeesTellerModelView(TellerModelView):
     datamodel = SQLAInterface(Teller)

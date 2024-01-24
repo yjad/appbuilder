@@ -151,3 +151,43 @@ class TrxCode(Model):
 
     def __repr__(self):
         return f"{self.db_cr}{self.trx_code}- {self.description}"
+
+class StudentHistoryLevel(Model):
+    id = Column(Integer, primary_key=True)
+
+    student_id	= Column(Integer, ForeignKey('student.id'), nullable=False, primary_key=True) 
+    student_name = relationship("Student")
+
+    level_id = Column(CHAR(2), ForeignKey('level.id'), nullable=False, primary_key=True)
+    level = relationship("Level")
+
+    comment = Column(String(40))
+    user_id	= Column(Integer, ForeignKey('ab_user.id'))
+    create_date = Column(Date(), nullable = False, default = datetime.date.today())
+
+    def __repr__(self):
+        return f"{self.student_id}-{self.student_name}- {self.level}"
+    
+
+class StudentHistorySemester(Model):
+    id = Column(Integer, primary_key=True)
+
+    student_id	= Column(Integer, ForeignKey('student.id'), nullable=False, primary_key=True) 
+    student_name = relationship("Student")
+    
+    level_id = Column(CHAR(2), ForeignKey('level.id'), nullable=False, primary_key=True)
+    level = relationship(
+        "Level",
+        primaryjoin="and_(StudentHistoryLevel.student_id==StudentHistorySemester.student_id, "
+        "StudentHistoryLevel.level_id==StudentHistorySemester.level_id)",
+    )
+
+    semester_no = Column(CHAR(5), ForeignKey('semester.id'), nullable=False, primary_key=True) 
+    semester = relationship("Semester")
+
+    comment = Column(String(40))
+    user_id	= Column(Integer, ForeignKey('ab_user.id'))
+    create_date = Column(Date(), nullable = False, default = datetime.date.today())
+
+    def __repr__(self):
+        return f"{self.student_id}-{self.student_name}- {self.level} - Semester: {self.semester_no}"
