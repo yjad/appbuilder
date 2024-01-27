@@ -9,7 +9,7 @@ from flask import g, flash, abort, redirect, send_file # current user
 from flask_appbuilder.actions import action
 
 from . import appbuilder, db
-from .models import Contact, ContactGroup, Gender, Student, Status, Semester, Level, Teller
+from .models import Contact, ContactGroup, Gender, Student, Status, Semester, Level, Teller, StudentLevel, StudentSemester
 from wtforms.fields import StringField
 
 
@@ -236,6 +236,83 @@ class SemesterModelView(ModelView):
         # raise ValueError("from pre_update")
     
 
+class StudentLevelModelView(ModelView):
+    datamodel = SQLAInterface(StudentLevel)
+    list_columns = ['student_id', 'student_name', 'level', 'create_date']
+    base_order = ('student_id', "asc")
+    # base_order = {'student_id':'asc', 'level':'asc'}  # multi column sort is not supported
+    # add_exclude_columns=['status', 'create_date'] # auto-increment & default is active 
+    """
+    show_fieldsets = [
+        ("Semesters", {"fields": 
+            ['semester_no','description','book_start_date','exam_start_date','exam_end_date','create_date','status']
+            })]
+
+    edit_fieldsets = [
+        ("Semesters", {"fields": 
+            ['semester_no','description','book_start_date','exam_start_date','exam_end_date','create_date','status']
+            })]
+    edit_exclude_columns=['semester_no', 'create_date'] # auto-increment & default is active 
+    edit_form_extra_fields = {
+    'semester_no': StringField('semester_no', widget=BS3TextFieldROWidget())
+    }
+    """
+    def pre_add(self, rec: Any) -> None:
+        rec.user_id = g.user.id       
+
+    """    
+    def post_add(self, rec: Any) -> None:
+        print ("========= from post_add ==============", vars(rec))
+        raise ValueError("from post_add")   # does not apply here
+    
+    def pre_update(self, rec: Any) -> None:
+        print ("+++++++++++ from pre_update ++++++++++++")
+        # raise ValueError("from pre_update")
+
+    """
+
+
+class StudentSemesterModelView(ModelView):
+    datamodel = SQLAInterface(StudentSemester)
+    list_columns = ['student_id', 'student_name', 'level', 'semester', 'create_date']
+    base_order = ('student_id', "asc")
+    # base_order = {'student_id':'asc', 'level':'asc'}  # multi column sort is not supported
+    base_permissions = ['can_add','can_show','can_edit', 'can_list','can_delete']  
+
+    # add_exclude_columns=['status', 'create_date'] # auto-increment & default is active 
+    """
+    show_fieldsets = [
+        ("Semesters", {"fields": 
+            ['semester_no','description','book_start_date','exam_start_date','exam_end_date','create_date','status']
+            })]
+
+    edit_fieldsets = [
+        ("Semesters", {"fields": 
+            ['semester_no','description','book_start_date','exam_start_date','exam_end_date','create_date','status']
+            })]
+    edit_exclude_columns=['semester_no', 'create_date'] # auto-increment & default is active 
+    edit_form_extra_fields = {
+    'semester_no': StringField('semester_no', widget=BS3TextFieldROWidget())
+    }
+    """
+    def pre_add(self, rec: Any) -> None:
+        rec.user_id = g.user.id     
+        # print (f"==============={vars(rec)} ")  
+        #student_name: "1-0001-محمود الحسينى- Level 3"
+        # rec.student_level_id = int(rec.student_name[0])
+
+
+    """    
+    def post_add(self, rec: Any) -> None:
+        print ("========= from post_add ==============", vars(rec))
+        raise ValueError("from post_add")   # does not apply here
+    
+    def pre_update(self, rec: Any) -> None:
+        print ("+++++++++++ from pre_update ++++++++++++")
+        # raise ValueError("from pre_update")
+
+    """
+
 # ---------------
 class TellerModelView(ModelView):
     datamodel = SQLAInterface(Teller)
@@ -361,6 +438,8 @@ appbuilder.add_view(
 # TODO: change layout of fields to be on 2 columns rather than as it is now. Needed for long pages like Student.
 appbuilder.add_view(StudentModelView, "Students", icon="fa-graduation-cap", category="Students", category_icon="fa-school")
 appbuilder.add_view(SemesterModelView, "Semisters",  category="Students")
+appbuilder.add_view(StudentLevelModelView, "Student Levels",  category="Students")
+appbuilder.add_view(StudentSemesterModelView, "Student Semester",  category="Students")
 
 #---------------------
 
