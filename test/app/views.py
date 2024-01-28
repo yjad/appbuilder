@@ -150,9 +150,10 @@ class StudentModelView(ModelView):
 
     list_columns = ['id','name_en','passport_no','birth_dt','nationality','gender.name','phone_no','status.name']
     base_order = ("name_en", "asc")
+    label_columns = {'add_dt':'Add Date'}
 
     show_fieldsets = [
-        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no', 'level']}),
+        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no', 'level.id']}),
         (
             "Student data",
             {
@@ -170,7 +171,7 @@ class StudentModelView(ModelView):
                     'semester',
                     'add_dt'
                 ],
-                "expanded": True,
+                "expanded": False,
             },
         ),
     ]
@@ -180,8 +181,8 @@ class StudentModelView(ModelView):
     
     edit_form_extra_fields = {
         'id': StringField('id', widget=BS3TextFieldROWidget()),
-        'level': StringField('id', widget=BS3TextFieldROWidget()),
-        'semester': StringField('id', widget=BS3TextFieldROWidget())
+        'level': StringField('level', widget=BS3TextFieldROWidget()),
+        'semester': StringField('semester', widget=BS3TextFieldROWidget())
 
     }
     edit_fieldsets = [
@@ -266,21 +267,26 @@ class StudentLevelModelView(ModelView):
         print ("== StudentLevelModelView - pre_add ===>", vars(rec), " rec.student_id:",  rec.student_id)
         rec.user_id = g.user.id    
         # update Student.level
+        # db.session.query(Student).\
+        #     filter(Student.id == rec.student_id).\
+        #     update({'level': rec.level_id})
+        # db.session.commit()   
+
+        
+    def post_add(self, rec: Any) -> None:
+        print ("== StudentLevelModelView - post_add ===>", vars(rec), " rec.student_id:",  rec.student_name.id)
+        rec.user_id = g.user.id    
+        # update Student.level
         db.session.query(Student).\
-            filter(Student.id == rec.student_id).\
+            filter(Student.id == rec.student_name.id).\
             update({'level': rec.level_id})
         db.session.commit()   
 
-    """    
-    def post_add(self, rec: Any) -> None:
-        print ("========= from post_add ==============", vars(rec))
-        raise ValueError("from post_add")   # does not apply here
-    
     """
     def pre_update(self, rec: Any) -> None:
         print ("+++++++++++ from StudentLevelModelView--> pre_update ++++++++++++")
         # raise ValueError("from pre_update")
-
+    """
 
 
 

@@ -78,10 +78,10 @@ class Student(Model):
     status_id = Column(Integer, ForeignKey('status.id'), nullable=False, default=1) 
     status = relationship("Status")
 
-    level = Column(Integer, ForeignKey('level.id'), nullable=True) 
-    status = relationship("Level")
-    semester = Column(Integer, ForeignKey('semester.id'), nullable=True) 
-    status = relationship("Semester")
+    level_id = Column(Integer, ForeignKey('level.id'), nullable=True) 
+    level = relationship("Level")
+    semester_id = Column(Integer, ForeignKey('semester.id'), nullable=True) 
+    semester = relationship("Semester")
     add_dt = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
