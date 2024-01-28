@@ -77,6 +77,11 @@ class Student(Model):
     how_did_know = Column(String(20), nullable=True)
     status_id = Column(Integer, ForeignKey('status.id'), nullable=False, default=1) 
     status = relationship("Status")
+
+    level = Column(Integer, ForeignKey('level.id'), nullable=True) 
+    status = relationship("Level")
+    semester = Column(Integer, ForeignKey('semester.id'), nullable=True) 
+    status = relationship("Semester")
     add_dt = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
@@ -141,7 +146,7 @@ class StudentSemester(Model):
     student_name = relationship("Student")
 
     student_level_id	= Column(Integer, ForeignKey('student_level.level_id'), nullable=False, primary_key=True) 
-    student_level = relationship("StudentLevel")
+    student_level = relationship("StudentLevel", uselist=False, )
     
     # level_id = Column(CHAR(2), ForeignKey('student_level.level_id'), nullable=False, primary_key=True)
     # level = relationship(

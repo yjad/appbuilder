@@ -152,7 +152,7 @@ class StudentModelView(ModelView):
     base_order = ("name_en", "asc")
 
     show_fieldsets = [
-        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no']}),
+        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no', 'level']}),
         (
             "Student data",
             {
@@ -167,6 +167,7 @@ class StudentModelView(ModelView):
                     'ref_address',
                     'how_did_know',
                     'status',
+                    'semester',
                     'add_dt'
                 ],
                 "expanded": True,
@@ -178,10 +179,13 @@ class StudentModelView(ModelView):
     add_exclude_columns=['id', 'status', 'add_dt'] # auto-increment & default is active 
     
     edit_form_extra_fields = {
-        'id': StringField('id', widget=BS3TextFieldROWidget())
+        'id': StringField('id', widget=BS3TextFieldROWidget()),
+        'level': StringField('id', widget=BS3TextFieldROWidget()),
+        'semester': StringField('id', widget=BS3TextFieldROWidget())
+
     }
     edit_fieldsets = [
-        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no']}),
+        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no', 'level']}),
         (
             "Student data",
             {
@@ -195,6 +199,7 @@ class StudentModelView(ModelView):
                     'ref_name',
                     'ref_address',
                     'how_did_know',
+                    'semester',
                     'status',
                     'add_dt'
                 ],
@@ -222,7 +227,7 @@ class SemesterModelView(ModelView):
     edit_form_extra_fields = {
     'semester_no': StringField('semester_no', widget=BS3TextFieldROWidget())
     }
-
+    """
     def pre_add(self, rec: Any) -> None:
     #     # raise ValueError("from pre_add")
         print ("========= from pre_add ==============",vars(rec))
@@ -234,7 +239,7 @@ class SemesterModelView(ModelView):
     def pre_update(self, rec: Any) -> None:
         print ("+++++++++++ from pre_update ++++++++++++")
         # raise ValueError("from pre_update")
-    
+    """
 
 class StudentLevelModelView(ModelView):
     datamodel = SQLAInterface(StudentLevel)
@@ -258,18 +263,25 @@ class StudentLevelModelView(ModelView):
     }
     """
     def pre_add(self, rec: Any) -> None:
-        rec.user_id = g.user.id       
+        print ("== StudentLevelModelView - pre_add ===>", vars(rec), " rec.student_id:",  rec.student_id)
+        rec.user_id = g.user.id    
+        # update Student.level
+        db.session.query(Student).\
+            filter(Student.id == rec.student_id).\
+            update({'level': rec.level_id})
+        db.session.commit()   
 
     """    
     def post_add(self, rec: Any) -> None:
         print ("========= from post_add ==============", vars(rec))
         raise ValueError("from post_add")   # does not apply here
     
+    """
     def pre_update(self, rec: Any) -> None:
-        print ("+++++++++++ from pre_update ++++++++++++")
+        print ("+++++++++++ from StudentLevelModelView--> pre_update ++++++++++++")
         # raise ValueError("from pre_update")
 
-    """
+
 
 
 class StudentSemesterModelView(ModelView):
