@@ -152,8 +152,9 @@ class StudentModelView(ModelView):
     base_order = ("name_en", "asc")
     label_columns = {'add_dt':'Add Date'}
 
+    
     show_fieldsets = [
-        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no', 'level.id']}),
+        ("Summary", {"fields": ['id','name_en','passport_no','birth_dt','nationality','gender','phone_no', 'level']}),
         (
             "Student data",
             {
@@ -177,12 +178,12 @@ class StudentModelView(ModelView):
     ]
 
     # add_fieldsets = show_fieldsets
-    add_exclude_columns=['id', 'status', 'add_dt'] # auto-increment & default is active 
+    add_exclude_columns=['id', 'status', 'add_dt', 'level', 'semester'] # auto-increment & default is active 
     
     edit_form_extra_fields = {
         'id': StringField('id', widget=BS3TextFieldROWidget()),
-        'level': StringField('level', widget=BS3TextFieldROWidget()),
-        'semester': StringField('semester', widget=BS3TextFieldROWidget())
+        'level': StringField('Level', widget=BS3TextFieldROWidget()),
+        'semester': StringField('Semester', widget=BS3TextFieldROWidget())
 
     }
     edit_fieldsets = [

@@ -85,7 +85,7 @@ class Student(Model):
     add_dt = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return f"{self.id:04d}-{self.name}"
+        return f"{self.id:04d}-{self.name} Level:{self.level.level if self.level else 'Not registered'}"
     
 class Country(Model):
     id = Column(Integer)
