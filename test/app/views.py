@@ -267,11 +267,7 @@ class StudentLevelModelView(ModelView):
     def pre_add(self, rec: Any) -> None:
         print ("== StudentLevelModelView - pre_add ===>", vars(rec), " rec.student_id:",  rec.student_id)
         rec.user_id = g.user.id    
-        # update Student.level
-        # db.session.query(Student).\
-        #     filter(Student.id == rec.student_id).\
-        #     update({'level': rec.level_id})
-        # db.session.commit()   
+        
 
         
     def post_add(self, rec: Any) -> None:
@@ -284,16 +280,16 @@ class StudentLevelModelView(ModelView):
         db.session.commit()   
 
     """
+    # TODO: should update Student record with the updated Level_id, if any
     def pre_update(self, rec: Any) -> None:
         print ("+++++++++++ from StudentLevelModelView--> pre_update ++++++++++++")
         # raise ValueError("from pre_update")
     """
 
 
-
 class StudentSemesterModelView(ModelView):
     datamodel = SQLAInterface(StudentSemester)
-    list_columns = ['student_id', 'student_name', 'level', 'semester', 'create_date']
+    list_columns = ['student_id', 'semester', 'create_date']
     base_order = ('student_id', "asc")
     # base_order = {'student_id':'asc', 'level':'asc'}  # multi column sort is not supported
     base_permissions = ['can_add','can_show','can_edit', 'can_list','can_delete']  

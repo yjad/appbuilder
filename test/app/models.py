@@ -85,7 +85,7 @@ class Student(Model):
     add_dt = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return f"{self.id:04d}-{self.name} Level:{self.level.level if self.level else 'Not registered'}"
+        return f"{self.id:04d}-{self.name} Level:{self.level.level if self.level else 'Not registered'} Semester: {self.semester}"
     
 class Country(Model):
     id = Column(Integer)
@@ -143,19 +143,11 @@ class StudentSemester(Model):
 
     # id	= Column(Integer, nullable=False, primary_key=True, autoincrement = True) 
     student_id	= Column(Integer, ForeignKey('student.id'), nullable=False, primary_key=True) 
-    student_name = relationship("Student")
+    student_data = relationship("Student")
 
-    student_level_id	= Column(Integer, ForeignKey('student_level.level_id'), nullable=False, primary_key=True) 
-    student_level = relationship("StudentLevel", uselist=False, )
-    
-    # level_id = Column(CHAR(2), ForeignKey('student_level.level_id'), nullable=False, primary_key=True)
-    # level = relationship(
-        # "StudentLevel",
-    #     # primaryjoin="and_(StudentSemester.student_level_id == StudentLevel.student_id, StudentSemester.level_id == StudentLevel.level_id)",
-    #     primaryjoin="StudentSemester.student_level_id == StudentLevel.student_id",
-    # )
-    # level = StudentLevel.query.filter("StudentLevel.student_id == StudentSemester.student_id").level_id.last()
-    semester_no = Column(CHAR(5), ForeignKey('semester.id'), nullable=False, unique=True, primary_key=True) 
+    level_id = Column(CHAR(5), nullable=False, primary_key=True) 
+
+    semester_id = Column(CHAR(5), ForeignKey('semester.id'), nullable=False, unique=True, primary_key=True) 
     semester = relationship("Semester")
 
     comment = Column(String(40))
@@ -163,7 +155,7 @@ class StudentSemester(Model):
     create_date = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return f"{self.student_id}-{self.student_name}- {self.level} - Semester: {self.semester_no}"
+        return f"{self.student_id}-{self.student_data}- Semester: {self.semester_no}"
 
 
 class Teller(Model):
