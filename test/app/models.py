@@ -55,6 +55,7 @@ class Contact(Model):
         date = self.birthday or mindate
         return datetime.datetime(date.year, 1, 1)
     
+
 class Student(Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(20), unique=False, nullable=True)
@@ -80,12 +81,12 @@ class Student(Model):
 
     level_id = Column(Integer, ForeignKey('level.id'), nullable=True) 
     level = relationship("Level")
-    semester_id = Column(Integer, ForeignKey('semester.id'), nullable=True) 
+    semester_id = Column(Integer, ForeignKey('semester.semester_no'), nullable=True) 
     semester = relationship("Semester")
     add_dt = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return f"{self.id:04d}-{self.name} Level:{self.level.level if self.level else 'Not registered'} Semester: {self.semester}"
+        return f"{self.id:04d}-{self.name}, {self.level.level if self.level else 'Level Not registered'}, semester: {self.semester_id}"
     
 class Country(Model):
     id = Column(Integer)
@@ -101,8 +102,7 @@ class Country(Model):
     
 
 class Semester(Model):
-    id	        = Column(Integer, unique = True, nullable=False, primary_key=True)
-    semester_no	= Column(CHAR(5), unique = True, nullable=False)
+    semester_no	= Column(CHAR(3), unique = True, nullable=False, primary_key=True)
     description	= Column(String(20), nullable=False)
     book_start_date	= Column(Date(), nullable=False)
     exam_start_date	= Column(Date(), nullable=True)
@@ -112,7 +112,8 @@ class Semester(Model):
     create_date = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return f"{self.id:02d}- {self.description}"
+        # return f"{self.semester_no}- {self.description}"
+        return self.semester_no
 
 class Level(Model):
     id = Column(CHAR(2), primary_key=True, unique=True, nullable=False)
@@ -147,16 +148,31 @@ class StudentSemester(Model):
 
     level_id = Column(CHAR(5), nullable=False, primary_key=True) 
 
-    semester_id = Column(CHAR(5), ForeignKey('semester.id'), nullable=False, unique=True, primary_key=True) 
-    semester = relationship("Semester")
+    semester_id = Column(CHAR(5), ForeignKey('semester.semester_no'), nullable=False, primary_key=True) 
+    semester = relationship("Semester", order_by= "Semester.semester_no")
 
     comment = Column(String(40))
     user_id	= Column(Integer, ForeignKey('ab_user.id'))
     create_date = Column(Date(), nullable = False, default = datetime.date.today())
 
     def __repr__(self):
-        return f"{self.student_id}-{self.student_data}- Semester: {self.semester_no}"
+        return f"{self.student_id}-{self.student_data}"
 
+# info of students in class
+class StudentClass(Model):
+
+    class_id	= Column(Integer, nullable=False, primary_key=True, autoincrement = True) 
+    level_id = Column(CHAR(5), nullable=False, primary_key=True)
+    semester_id = Column(CHAR(5), ForeignKey('semester.semester_no'), nullable=False, primary_key=True) 
+    semester = relationship("Semester", order_by= "Semester.semester_no")
+    comment = Column(String(40))
+    start_date	= Column(Date(), nullable=False)
+    end_date	= Column(Date(), nullable=True)
+    user_id	= Column(Integer, ForeignKey('ab_user.id'))
+    create_date = Column(Date(), nullable = False, default = datetime.date.today())
+
+    def __repr__(self):
+        return f"{self.student_id}-{self.student_data}"
 
 class Teller(Model):
     trx_id	= Column(Integer, primary_key=True)
@@ -176,7 +192,7 @@ class Teller(Model):
     level_id = Column(CHAR(2), ForeignKey('level.id'), nullable=False)
     level = relationship("Level")
 
-    semester_no = Column(CHAR(5), ForeignKey('semester.id'), nullable=False) 
+    semester_no = Column(CHAR(5), ForeignKey('semester.semester_no'), nullable=False) 
     semester = relationship("Semester")
 
     payee	= Column(String(20))
