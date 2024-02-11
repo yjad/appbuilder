@@ -62,17 +62,17 @@ class Students(Model):
     
 
 class Enrollments(Model):
-    course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
-    # courses = relationship('Courses.filter(Courses.category_id ==1)')
-    courses = relationship('Courses')
-
-    cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
-    # cycles= relationship('Cycles.filter(Cycles.cycle_id == 1)')
-    cycles= relationship('Cycles')
-    # TODO: check foriegn key of CoursesByCycle
     student_id = Column(String(10), ForeignKey('students.student_id'), nullable=False, primary_key= True)
     students = relationship('Students')
 
+    cycle_id = Column(String(10), ForeignKey('Cycles.cycle_id'), nullable=False, primary_key= True)
+    cycles= relationship('Cycles')
+
+    course_id = Column(String(10), ForeignKey('CoursesPerCycle.course_id'), nullable=False, primary_key= True)
+    # courses = relationship('Courses', primaryjoin="and_(Enrollments.course_id==CoursesPerCycle.course_id, Enrollments.cycle_id==CoursesPerCycle.cycle_id)")
+    courses = relationship('CoursesPerCycle')#, primaryjoin="and_(Enrollments.course_id==CoursesPerCycle.course_id, Enrollments.cycle_id==CoursesPerCycle.cycle_id)")
+
+    
     enrollment_date = Column(Date(),  nullable=False, default= datetime.date.today())
     cancelled = Column(Boolean(),  nullable=False, default=False)
     cancellation_reason = Column(String(100),  nullable=True)
