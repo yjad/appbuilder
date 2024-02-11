@@ -63,9 +63,11 @@ class Students(Model):
 
 class Enrollments(Model):
     course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
+    # courses = relationship('Courses.filter(Courses.category_id ==1)')
     courses = relationship('Courses')
 
     cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
+    # cycles= relationship('Cycles.filter(Cycles.cycle_id == 1)')
     cycles= relationship('Cycles')
     # TODO: check foriegn key of CoursesByCycle
     student_id = Column(String(10), ForeignKey('students.student_id'), nullable=False, primary_key= True)
@@ -116,18 +118,18 @@ class Classes(Model):
         return self.course_id+','+self.cycle_id+',class'+self.class_no +', teacher:', {self.teachers.teacher_id}
     
 
-class Attendances(Model):
-    cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
-    cycles= relationship('Cycles')
-    course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
-    courses = relationship('Courses')
-    class_no = Column(Integer(), ForeignKey('classes.class_no'), nullable=False, primary_key= True)
-    courses = relationship('Classes.query.filter(Classess.cycle_id.has == self.cycle_id)')
+# class Attendances(Model):
+#     cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
+#     cycles= relationship('Cycles')
+#     course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
+#     courses = relationship('Courses')
+#     class_no = Column(Integer(), ForeignKey('classes.class_no'), nullable=False, primary_key= True)
+#     courses = relationship('Classes.query.filter(Classess.cycle_id.has == self.cycle_id)')
 
-    student_id = Column(String(10), ForeignKey('students.student_id'), nullable=False, primary_key= True) ##
-    students = relationship('Students')
+#     student_id = Column(String(10), ForeignKey('students.student_id'), nullable=False, primary_key= True) ##
+#     students = relationship('Students')
     
-    time_arrive = Column(Time(), nullable = True)
-    time_leave = Column(Time(), nullable = True)
-    def __repr__(self):
-        return f"Student:{self.student_id}-{self.students.student_name}, course:{self.course_id}, cycle:{self.cycle_id}, class:{self.class_no}"
+#     time_arrive = Column(Time(), nullable = True)
+#     time_leave = Column(Time(), nullable = True)
+#     def __repr__(self):
+#         return f"Student:{self.student_id}-{self.students.student_name}, course:{self.course_id}, cycle:{self.cycle_id}, class:{self.class_no}"

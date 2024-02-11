@@ -23,6 +23,7 @@ def all_fields(class_name):
             col_list.append(k)
     return col_list
 
+
 class StudentsModelView(ModelView):
     datamodel = SQLAInterface(Students)
     col_list = all_fields(Students)
