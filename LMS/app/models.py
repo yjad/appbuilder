@@ -40,15 +40,16 @@ class Cycles(Model):
 
         
 class CoursesPerCycle(Model):
-    course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
-    courses = relationship('Courses')
     cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
     cycles = relationship('Cycles')
+    course_cycle_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
+    courses = relationship('Courses')
+
     course_start_date = Column(Date(),  nullable=False)
     course_end_date = Column(Date(),  nullable=False)
 
     def __repr__(self):
-        return f"{self.course_id}-{self.courses.course_description}, {self.cycle_id}:{self.cycles.cycle_description}"
+        return f"{self.course_cycle_id}-{self.courses.course_description}, {self.cycle_id}:{self.cycles.cycle_description}"
 
 
 class Students(Model):
@@ -65,13 +66,12 @@ class Enrollments(Model):
     student_id = Column(String(10), ForeignKey('students.student_id'), nullable=False, primary_key= True)
     students = relationship('Students')
 
-    cycle_id = Column(String(10), ForeignKey('Cycles.cycle_id'), nullable=False, primary_key= True)
+    cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
     cycles= relationship('Cycles')
 
-    course_id = Column(String(10), ForeignKey('CoursesPerCycle.course_id'), nullable=False, primary_key= True)
-    # courses = relationship('Courses', primaryjoin="and_(Enrollments.course_id==CoursesPerCycle.course_id, Enrollments.cycle_id==CoursesPerCycle.cycle_id)")
-    courses = relationship('CoursesPerCycle')#, primaryjoin="and_(Enrollments.course_id==CoursesPerCycle.course_id, Enrollments.cycle_id==CoursesPerCycle.cycle_id)")
-
+    enrollment_course_id = Column(String(10), ForeignKey('courses_per_cycle.course_cycle_id'), nullable=False, primary_key= True)
+    courses_per_cycle = relationship('CoursesPerCycle', 
+                                     primaryjoin="and_(Enrollments.cycle_id==CoursesPerCycle.cycle_id, Enrollments.enrollment_course_id==CoursesPerCycle.course_cycle_id)")
     
     enrollment_date = Column(Date(),  nullable=False, default= datetime.date.today())
     cancelled = Column(Boolean(),  nullable=False, default=False)

@@ -109,20 +109,21 @@ class EnrollmentsModelView(ModelView):
     # col_list = all_fields(Enrollments)
     # print (col_list)
     # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
-    add_columns = ['students', 'cycles', 'courses']
-    list_columns = ['students', 'cycles', 'courses', 'cancelled']
-    edit_columns =  ['students', 'cycles', 'courses', 'cancelled', 'cancellation_reason']
+    add_columns = ['students', 'cycles', 'courses_per_cycle']
+    list_columns = ['students', 'cycles', 'courses_per_cycle', 'cancelled']
+    edit_columns =  ['students', 'cycles', 'courses_per_cycle', 'cancelled', 'cancellation_reason']
     show_columns = edit_columns.copy()
 
-    def pre_add(self, rec: Any) -> None:
-        rec.course_id = rec.courses.course_id
-        rec.cycle_id = rec.cycles.cycle_id
-        rec.student_id = rec.students.student_id
+    # def pre_add(self, rec: Any) -> None:
+    #     rec.courses_per_cycle.course_id = rec.courses.course_id
+    #     rec.cycle_id = rec.cycles.cycle_id
+    #     rec.student_id = rec.students.student_id
 
-    def pre_edit(self, rec: Any) -> None:
-        rec.course_id = rec.courses.course_id
-        rec.cycle_id = rec.cycles.cycle_id
-        rec.student_id = rec.students.student_id
+    # def pre_edit(self, rec: Any) -> None:
+    #     # rec.course_id = rec.courses.course_id
+    #     rec.courses_per_cycle.course_id = rec.courses.course_id
+    #     rec.cycle_id = rec.cycles.cycle_id
+    #     rec.student_id = rec.students.student_id
 
     # TODO: disable primary key fiedlds during Edit
         
