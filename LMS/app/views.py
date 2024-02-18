@@ -18,11 +18,16 @@ db.create_all()
 
 def all_fields(class_name):
     col_list = []
-    for k, v in class_name.__dict__.items():
+    for k, _ in class_name.__dict__.items():
         if not k.startswith('_'):
             col_list.append(k)
     return col_list
 
+class BS3TextFieldROWidget(BS3TextFieldWidget):
+    def __call__(self, field, **kwargs):
+        kwargs['readonly'] = 'true'
+        return super(BS3TextFieldROWidget, self).__call__(field, **kwargs)
+    
 
 class StudentsModelView(ModelView):
     datamodel = SQLAInterface(Students)
@@ -109,10 +114,19 @@ class EnrollmentsModelView(ModelView):
     # col_list = all_fields(Enrollments)
     # print (col_list)
     # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
-    add_columns = ['students', 'cycles', 'courses_per_cycle']
-    list_columns = ['students', 'cycles', 'courses_per_cycle', 'cancelled']
-    edit_columns =  ['students', 'cycles', 'courses_per_cycle', 'cancelled', 'cancellation_reason']
+    add_columns = ['students',  'cycles', 'courses_per_cycle']
+   
+    list_columns = ['students', 'cycles', 'courses_per_cycle', 'enrollment_date', 'cancelled']
+    edit_columns =  ['students', 'cycles','courses_per_cycle', 'enrollment_date','cancelled', 'cancellation_reason']
+    #  add_exclude_columns=['id', 'status', 'add_dt', 'level', 'semester'] # auto-increment & default is active 
+    edit_form_extra_fields = {
+        'students': StringField('students', widget=BS3TextFieldROWidget()),
+        'cycles': StringField('cycles', widget=BS3TextFieldROWidget()),
+        'courses_per_cycle': StringField('courses_per_cycle', widget=BS3TextFieldROWidget()),
+        'enrollment_date': StringField('enrollment_date', widget=BS3TextFieldROWidget()),
+    }
     show_columns = edit_columns.copy()
+
 
     # def pre_add(self, rec: Any) -> None:
     #     rec.courses_per_cycle.course_id = rec.courses.course_id

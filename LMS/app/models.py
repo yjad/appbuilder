@@ -42,14 +42,14 @@ class Cycles(Model):
 class CoursesPerCycle(Model):
     cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
     cycles = relationship('Cycles')
-    course_cycle_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
+    course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
     courses = relationship('Courses')
 
     course_start_date = Column(Date(),  nullable=False)
     course_end_date = Column(Date(),  nullable=False)
 
     def __repr__(self):
-        return f"{self.course_cycle_id}-{self.courses.course_description}, {self.cycle_id}:{self.cycles.cycle_description}"
+        return f"{self.cycle_id}-{self.courses.course_description}, {self.cycle_id}:{self.cycles.cycle_description}"
 
 
 class Students(Model):
@@ -68,17 +68,25 @@ class Enrollments(Model):
 
     cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
     cycles= relationship('Cycles')
-
-    enrollment_course_id = Column(String(10), ForeignKey('courses_per_cycle.course_cycle_id'), nullable=False, primary_key= True)
+    enrollment_course_id = Column(String(10), ForeignKey('courses_per_cycle.course_id'), nullable=False, primary_key= True)
+    
     courses_per_cycle = relationship('CoursesPerCycle', 
-                                     primaryjoin="and_(Enrollments.cycle_id==CoursesPerCycle.cycle_id, Enrollments.enrollment_course_id==CoursesPerCycle.course_cycle_id)")
+            primaryjoin="and_(Enrollments.cycle_id==CoursesPerCycle.cycle_id, Enrollments.enrollment_course_id==CoursesPerCycle.course_id)")
+            # primaryjoin="and_(Enrollments.cycle_id==CoursesPerCycle.cycle_id, Enrollments.enrollment_course_id==CoursesPerCycle.course_id)")
     
     enrollment_date = Column(Date(),  nullable=False, default= datetime.date.today())
     cancelled = Column(Boolean(),  nullable=False, default=False)
     cancellation_reason = Column(String(100),  nullable=True)
 
+# to fix the error of foreign key mismatch on SQLITE, go to sqlite and modify
+#   FOREIGN KEY("cycle_id") REFERENCES "courses_per_cycle"("cycle_id"),
+#	FOREIGN KEY("enrollment_course_id") REFERENCES "courses_per_cycle"("course_id"), 
+# with 
+#   FOREIGN KEY(cycle_id, enrollment_course_id) REFERENCES courses_per_cycle (cycle_id, course_id)
+    
     def __repr__(self):
-        return self.course_id+ ','+ self.cycle_id + ', Student'+ self.students.student_name
+        return self.students.student_name+ ','+self.course_id+ ','+ self.cycle_id + ', Student'+ self.students.student_name
+
 
 class Teachers(Model):
     teacher_id = Column(String(10), nullable=False, primary_key= True)
