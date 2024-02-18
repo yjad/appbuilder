@@ -91,19 +91,32 @@ class CoursesPerCycleModelView(ModelView):
     datamodel = SQLAInterface(CoursesPerCycle)
 
     col_list = all_fields(CoursesPerCycle)
-    print (col_list)
+    # print (col_list)
     # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
     col_list = ['cycles','courses',  'course_start_date', 'course_end_date']
     add_columns = col_list.copy()
     list_columns = col_list.copy() 
     edit_columns = col_list.copy()
     show_columns = col_list.copy()
-
+    
     def pre_add(self, rec: Any) -> None:
         rec.course_id = rec.courses.course_id
         rec.cycle_id = rec.cycles.cycle_id
-
+        #TODO: following validation should be done on FE using JS
+        if rec.course_start_date > rec.course_end_date:
+            raise ValueError("Start-date cannot be after end-date ....")
+        
+        # TODO: this is backend validation but it flushes the entered data. should save data for retry
+        # or send cycle start/end date as hidden data to be used in JS FE validation.
+        if rec.course_start_date < rec.cycles.cycle_start_date or \
+           rec.course_end_date > rec.cycles.cycle_end_date:
+            raise ValueError("Course Start/End dates should be within Cycle's Start/Snd dates ....")
+        
     def pre_edit(self, rec: Any) -> None:
+        #TODO: following validation should be done on FE using JS
+        if rec.course_start_date > rec.course_end_date:
+            raise ValueError("Start-date cannot be after end-date ....")
+        
         rec.course_id = rec.courses.course_id
         rec.cycle_id = rec.cycles.cycle_id
 
@@ -119,12 +132,14 @@ class EnrollmentsModelView(ModelView):
     list_columns = ['students', 'cycles', 'courses_per_cycle', 'enrollment_date', 'cancelled']
     edit_columns =  ['students', 'cycles','courses_per_cycle', 'enrollment_date','cancelled', 'cancellation_reason']
     #  add_exclude_columns=['id', 'status', 'add_dt', 'level', 'semester'] # auto-increment & default is active 
-    edit_form_extra_fields = {
-        'students': StringField('students', widget=BS3TextFieldROWidget()),
-        'cycles': StringField('cycles', widget=BS3TextFieldROWidget()),
-        'courses_per_cycle': StringField('courses_per_cycle', widget=BS3TextFieldROWidget()),
-        'enrollment_date': StringField('enrollment_date', widget=BS3TextFieldROWidget()),
-    }
+    # readonly fields gives error during edit : "'str' object has no attribute '_sa_instance_state'"
+
+    # edit_form_extra_fields = {
+        # 'students': StringField('students', widget=BS3TextFieldROWidget()),
+    #     'cycles': StringField('cycles', widget=BS3TextFieldROWidget()),
+    #     'courses_per_cycle': StringField('courses_per_cycle', widget=BS3TextFieldROWidget()),
+    #     'enrollment_date': StringField('enrollment_date', widget=BS3TextFieldROWidget()),
+    # }
     show_columns = edit_columns.copy()
 
 
@@ -171,7 +186,7 @@ class TeachersPerCourseModelView(ModelView):
     datamodel = SQLAInterface(TeachersPerCourse)
 
     col_list = all_fields(TeachersPerCourse)
-    print (col_list)
+    # print (col_list)
     # col_list = ['cycles', 'courses', 'class_no', 'class_title', 'teachers',  'start_date', 'end_date']
     # # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
     # add_columns = col_list.copy()

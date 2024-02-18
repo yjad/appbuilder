@@ -75,7 +75,7 @@ class Enrollments(Model):
             # primaryjoin="and_(Enrollments.cycle_id==CoursesPerCycle.cycle_id, Enrollments.enrollment_course_id==CoursesPerCycle.course_id)")
     
     enrollment_date = Column(Date(),  nullable=False, default= datetime.date.today())
-    cancelled = Column(Boolean(),  nullable=False, default=False)
+    cancelled = Column(Boolean(),  nullable=True, default=False)
     cancellation_reason = Column(String(100),  nullable=True)
 
 # to fix the error of foreign key mismatch on SQLITE, go to sqlite and modify
