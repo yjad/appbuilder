@@ -98,6 +98,10 @@ class CoursesPerCycleModelView(ModelView):
     list_columns = col_list.copy() 
     edit_columns = col_list.copy()
     show_columns = col_list.copy()
+    # extra filed validation
+    # validators_columns = {
+    #     'my_field1':[EqualTo('my_field2', message=gettext('fields must match'))]
+    # }
     
     def pre_add(self, rec: Any) -> None:
         rec.course_id = rec.courses.course_id
