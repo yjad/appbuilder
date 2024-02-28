@@ -27,15 +27,34 @@ function showError(formFieldError) {
 function validateForm(form_title) {
     switch(form_title) {
         case "Add Courses Per Cycle":
-            // let FROM = document.forms["model_form"]["from_date"].value;
-            // let TO = document.forms["myForm"]["to_date"].value;
+            // let FROM = document.forms["model_form"]["course_start_date"].value;
+            // let TO = document.forms["myForm"]["course_end_date"].value;
             FROM=  document.getElementById('course_start_date').value;
             TO=  document.getElementById('course_end_date').value;
-            console.log(FROM, TO)
+            console.log("Dates Entered: ", FROM, TO)
             if (FROM > TO){
-                // var from_dateError = document.querySelector("#course_end_date"+"span.error")
+                try{
+                    document.getElementById('course_end_date').enabled = true;
+                    // var x =  document.getElementById('modal-confirm').value;
+                    // var _dateError = document.querySelectorAll(".alert.alert-danger");
+                    // var _dateError = document.querySelectorAll(".alert");
+                    // console.log ("length: ", _dateError.length, 'x:', x)
+                    // _dateError[0].innerHTML = 'Yahia ....'
+                    // alert("This is an alert message box."); //worked
+                    // var field = document.getElementById('course_end_date');
+                    // field.innerHTML = field.value + "  **** Invalid Date Range"
+                    // console.log ("field: ", field, "new value", field.innerHTML)
+                    var x = document.getElementsByClassName('help-block');
+                    console.log('alert.alert-danger', x);
+                    x[3].outerText = 'Invalid Date Range';
+                    
+
+                } catch(err){
+                    console.log("Error - Invalid query selector");
+                }
+                // _dateError.innerHTML = 'Invalid date range'
                 // showError(from_dateError)
-                console.log("Error - Invalidae date range .....", FROM , TO)
+                
                 return false;       // stop sending the form
             } else {
                 return true;        // validation OK
