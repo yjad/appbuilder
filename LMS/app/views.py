@@ -11,6 +11,7 @@ from flask_appbuilder.actions import action
 from . import appbuilder, db
 from .models import Students, Teachers, Categories, Courses, Cycles, CoursesPerCycle, Enrollments, Classes, TeachersPerCourse
 from wtforms.fields import StringField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 
 
 db.create_all()
@@ -77,8 +78,30 @@ class CoursesModelView(ModelView):
     def pre_edit(self, rec: Any) -> None:
         rec.category_id = rec.categories.category_id
 
+def check_from_to_dates(d2, message):
+    message = f"From/date does not match:{d2}"
+    # print ("***d2: ", d2, "message:", message)
+    def _check_from_to_dates(form, field):
+        # l = field.data and len(field.data) or 0
+        # if l < min or max != -1 and l > max:
+        print ("***Form: ", form, "\n***Field: ",field, "\nd2:", d2)
+        if field.data > d2:
+            raise ValidationError(message)
+
+    return _check_from_to_dates
+
+# def check_from_to_dates(f1, message): 
+#         print (f"******** f1:{f1}, message: {message}")
+#         # raise ValidationError(message)
+
 class CyclesModelView(ModelView):
     datamodel = SQLAInterface(Cycles)
+    # extra filed validation
+    validators_columns = {
+        # 'cycle_end_date':[EqualTo('cycle_start_date', message='fields must match')]
+        'cycle_end_date':[check_from_to_dates('cycle_start_date', message='fields must match')]
+        # 'cycle_end_date':[check_from_to_dates(self.cycle_start_date, self.cycle_end_date, message='fields must match')]
+    }
 
     col_list = all_fields(Cycles)
     add_columns = col_list.copy()
