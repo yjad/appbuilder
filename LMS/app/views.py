@@ -2,8 +2,9 @@ import calendar
 import io
 
 from typing import Any#, List, Optional
-from flask_appbuilder import ModelView
-from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+from flask_appbuilder import ModelView 
+from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, Select2AJAXWidget, Select2SlaveAJAXWidget
+from flask_appbuilder.fields import AJAXSelectField
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask import g, flash, abort, redirect, send_file, url_for, request # current user
 from flask_appbuilder.actions import action
@@ -11,7 +12,8 @@ from flask_appbuilder.actions import action
 from . import appbuilder, db
 from .models import Students, Teachers, Categories, Courses, Cycles, CoursesPerCycle, Enrollments, Classes, TeachersPerCourse
 from wtforms.fields import StringField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from wtforms.validators import ValidationError #, DataRequired, Email, EqualTo, Length
+from .formVal import check_date_range
 
 
 db.create_all()
@@ -78,29 +80,14 @@ class CoursesModelView(ModelView):
     def pre_edit(self, rec: Any) -> None:
         rec.category_id = rec.categories.category_id
 
-def check_from_to_dates(d2, message):
-    message = f"From/date does not match:{d2}"
-    # print ("***d2: ", d2, "message:", message)
-    def _check_from_to_dates(form, field):
-        # l = field.data and len(field.data) or 0
-        # if l < min or max != -1 and l > max:
-        print ("***Form: ", form, "\n***Field: ",field, "\nd2:", d2)
-        if field.data > d2:
-            raise ValidationError(message)
 
-    return _check_from_to_dates
-
-# def check_from_to_dates(f1, message): 
-#         print (f"******** f1:{f1}, message: {message}")
-#         # raise ValidationError(message)
 
 class CyclesModelView(ModelView):
     datamodel = SQLAInterface(Cycles)
-    # extra filed validation
+    # extra fieled validations
     validators_columns = {
-        # 'cycle_end_date':[EqualTo('cycle_start_date', message='fields must match')]
-        'cycle_end_date':[check_from_to_dates('cycle_start_date', message='fields must match')]
-        # 'cycle_end_date':[check_from_to_dates(self.cycle_start_date, self.cycle_end_date, message='fields must match')]
+        'cycle_end_date':[check_date_range('cycle_start_date', message=None)],
+        'vacation_end_date':[check_date_range('vacation_start_date')],
     }
 
     col_list = all_fields(Cycles)
@@ -113,25 +100,44 @@ class CyclesModelView(ModelView):
 class CoursesPerCycleModelView(ModelView):
     datamodel = SQLAInterface(CoursesPerCycle)
 
+    # add_form_extra_fields = {
+    #     'cycles': AJAXSelectField('cycles',
+    #     description='This will be populated with AJAX',
+    #     datamodel=datamodel,
+    #     col_name='cycle_id',
+    #     widget=Select2AJAXWidget(endpoint='/contactmodelview/api/column/add/cycles')),
+
+    #     'courses_per_cycle': AJAXSelectField('Courses of the Cycle',
+    #     description='Extra Field description',
+    #     datamodel=datamodel,
+    #     col_name='course_id',
+    #     widget=Select2SlaveAJAXWidget(master_id='cycles',
+    #     endpoint='/contactmodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{ID}}'))
+    #     }
+    
+
     col_list = all_fields(CoursesPerCycle)
     # print (col_list)
     # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
-    col_list = ['cycles','courses',  'course_start_date', 'course_end_date']
+    # col_list = ['cycles','courses',  'course_start_date', 'course_end_date']
+    col_list = ['cycles','courses_per_cycle',  'course_start_date', 'course_end_date']
+    # col_list = ['course_start_date', 'course_end_date']
     add_columns = col_list.copy()
     list_columns = col_list.copy() 
     edit_columns = col_list.copy()
     show_columns = col_list.copy()
     # extra filed validation
-    # validators_columns = {
-    #     'my_field1':[EqualTo('my_field2', message=gettext('fields must match'))]
-    # }
+    validators_columns = {
+        'course_end_date':[check_date_range('course_start_date', message=None)],
+        'vacation_end_date':[check_date_range('vacation_start_date')],
+    }
     
     def pre_add(self, rec: Any) -> None:
         rec.course_id = rec.courses.course_id
         rec.cycle_id = rec.cycles.cycle_id
-        #TODO: following validation should be done on FE using JS
-        if rec.course_start_date > rec.course_end_date:
-            raise ValueError("Start-date cannot be after end-date ....")
+        #TODODone: following validation should be done on FE using JS
+        # if rec.course_start_date > rec.course_end_date:
+        #     raise ValueError("Start-date cannot be after end-date ....")
         
         # TODO: this is backend validation but it flushes the entered data. should save data for retry
         # or send cycle start/end date as hidden data to be used in JS FE validation.
@@ -140,9 +146,9 @@ class CoursesPerCycleModelView(ModelView):
             raise ValueError("Course Start/End dates should be within Cycle's Start/Snd dates ....")
         
     def pre_edit(self, rec: Any) -> None:
-        #TODO: following validation should be done on FE using JS
-        if rec.course_start_date > rec.course_end_date:
-            raise ValueError("Start-date cannot be after end-date ....")
+        #TODODone: following validation should be done on FE using JS
+        # if rec.course_start_date > rec.course_end_date:
+        #     raise ValueError("Start-date cannot be after end-date ....")
         
         rec.course_id = rec.courses.course_id
         rec.cycle_id = rec.cycles.cycle_id
