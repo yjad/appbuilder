@@ -100,29 +100,30 @@ class CyclesModelView(ModelView):
 class CoursesPerCycleModelView(ModelView):
     datamodel = SQLAInterface(CoursesPerCycle)
 
-    # add_form_extra_fields = {
-    #     'cycles': AJAXSelectField('cycles',
-    #     description='This will be populated with AJAX',
-    #     datamodel=datamodel,
-    #     col_name='cycle_id',
-    #     widget=Select2AJAXWidget(endpoint='/contactmodelview/api/column/add/cycles')),
+    add_form_extra_fields = {
+        'cycles': AJAXSelectField('cycles',
+        description='This will be populated with AJAX',
+        datamodel=datamodel,
+        col_name='cycle_id',
+        widget=Select2AJAXWidget(endpoint='/contactmodelview/api/column/add/cycles')),
 
-    #     'courses_per_cycle': AJAXSelectField('Courses of the Cycle',
-    #     description='Extra Field description',
-    #     datamodel=datamodel,
-    #     col_name='course_id',
-    #     widget=Select2SlaveAJAXWidget(master_id='cycles',
-    #     endpoint='/contactmodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{ID}}'))
-    #     }
+        'courses_in_cycle': AJAXSelectField('Courses of the Cycle',
+        description='Extra Field description',
+        datamodel=datamodel,
+        col_name='course_id',
+        widget=Select2SlaveAJAXWidget(master_id='cycles',
+        endpoint='/contactmodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{cycle_id}}'))
+        }
     
 
     col_list = all_fields(CoursesPerCycle)
     # print (col_list)
     # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
     # col_list = ['cycles','courses',  'course_start_date', 'course_end_date']
-    col_list = ['cycles','courses_per_cycle',  'course_start_date', 'course_end_date']
-    # col_list = ['course_start_date', 'course_end_date']
-    add_columns = col_list.copy()
+    # col_list = ['cycles','courses_in_cycle',  'course_start_date', 'course_end_date']
+    col_list = ['course_start_date', 'course_end_date']
+    # add_columns = col_list.copy()
+    add_columns = ['cycles','courses_in_cycle',  'course_start_date', 'course_end_date']
     list_columns = col_list.copy() 
     edit_columns = col_list.copy()
     show_columns = col_list.copy()
