@@ -105,14 +105,14 @@ class CoursesPerCycleModelView(ModelView):
         description='This will be populated with AJAX',
         datamodel=datamodel,
         col_name='cycle_id',
-        widget=Select2AJAXWidget(endpoint='/contactmodelview/api/column/add/cycles')),
+        widget=Select2AJAXWidget(endpoint='/coursespercyclemodelview/api/column/add/cycles')),
 
         'courses_in_cycle': AJAXSelectField('Courses of the Cycle',
         description='Extra Field description',
         datamodel=datamodel,
         col_name='course_id',
         widget=Select2SlaveAJAXWidget(master_id='cycles',
-        endpoint='/contactmodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{cycle_id}}'))
+        endpoint='/coursespercyclemodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{cycle_id}}'))
         }
     
 
