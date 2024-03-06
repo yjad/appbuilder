@@ -6,7 +6,7 @@ class ExampleApi(BaseApi):
     @expose('/greeting')
     def greeting(self):
         
-        return self.response(200, message="Hello")
+        return self.response(200, Valid=False)
 
 
 appbuilder.add_api(ExampleApi)

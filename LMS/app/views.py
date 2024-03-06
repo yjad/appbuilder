@@ -13,8 +13,8 @@ from . import appbuilder, db
 from .models import Students, Teachers, Categories, Courses, Cycles, CoursesPerCycle, Enrollments, Classes, TeachersPerCourse
 from wtforms.fields import StringField
 from wtforms.validators import ValidationError #, DataRequired, Email, EqualTo, Length
-from .formVal import check_date_range
-
+from .formVal import check_date_range, validate_by_endpoint
+from .api import ExampleApi
 
 db.create_all()
 
@@ -88,6 +88,7 @@ class CyclesModelView(ModelView):
     validators_columns = {
         'cycle_end_date':[check_date_range('cycle_start_date', message=None)],
         'vacation_end_date':[check_date_range('vacation_start_date')],
+        'vacation_end_date':[validate_by_endpoint('/example_api')],
     }
 
     col_list = all_fields(Cycles)
@@ -252,4 +253,4 @@ appbuilder.add_view(CoursesModelView, "Courses", icon="fa-envelope", category="L
 appbuilder.add_view(CoursesPerCycleModelView, "Courses per Cycle", icon="fa-envelope", category="LMS")
 appbuilder.add_view(ClassesModelView, "Classes", icon="fa-envelope", category="LMS")
 appbuilder.add_view(TeachersPerCourseModelView, "Teachers Per Course", icon="fa-envelope", category="LMS")
-
+appbuilder.add_api(ExampleApi)
