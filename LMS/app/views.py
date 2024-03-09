@@ -11,10 +11,9 @@ from flask_appbuilder.actions import action
 
 from . import appbuilder, db
 from .models import Students, Teachers, Categories, Courses, Cycles, CoursesPerCycle, Enrollments, Classes, TeachersPerCourse
-from wtforms.fields import StringField
-from wtforms.validators import ValidationError #, DataRequired, Email, EqualTo, Length
-from .formVal import check_date_range, validate_by_endpoint
-from .api import ExampleApi
+# from wtforms.validators import ValidationError #, DataRequired, Email, EqualTo, Length
+from .formVal import check_date_range, check_course_cycle_dates, check_unique_course_cycle
+from .api import TestModelApi, ExampleApi
 
 db.create_all()
 
@@ -88,7 +87,7 @@ class CyclesModelView(ModelView):
     validators_columns = {
         'cycle_end_date':[check_date_range('cycle_start_date', message=None)],
         'vacation_end_date':[check_date_range('vacation_start_date')],
-        'vacation_end_date':[validate_by_endpoint('/example_api')],
+        # 'vacation_end_date':[validate_by_endpoint('/example_api')],
     }
 
     col_list = all_fields(Cycles)
@@ -101,38 +100,43 @@ class CyclesModelView(ModelView):
 class CoursesPerCycleModelView(ModelView):
     datamodel = SQLAInterface(CoursesPerCycle)
 
-    add_form_extra_fields = {
-        'cycles': AJAXSelectField('cycles',
-        description='This will be populated with AJAX',
-        datamodel=datamodel,
-        col_name='cycle_id',
-        widget=Select2AJAXWidget(endpoint='/coursespercyclemodelview/api/column/add/cycles')),
+    #TODO: to be fixed once a reply is recieved for fixing AJAX error
+    # add_form_extra_fields = {
+    #     'cycles': AJAXSelectField('cycles',
+    #     description='This will be populated with AJAX',
+    #     datamodel=datamodel,
+    #     col_name='cycle_id',
+    #     widget=Select2AJAXWidget(endpoint='/coursespercyclemodelview/api/column/add/cycles')),
 
-        'courses_in_cycle': AJAXSelectField('Courses of the Cycle',
-        description='Extra Field description',
-        datamodel=datamodel,
-        col_name='course_id',
-        widget=Select2SlaveAJAXWidget(master_id='cycles',
-        endpoint='/coursespercyclemodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{cycle_id}}'))
-        }
+    #     'courses_in_cycle': AJAXSelectField('Courses of the Cycle',
+    #     description='Extra Field description',
+    #     datamodel=datamodel,
+    #     col_name='course_id',
+    #     widget=Select2SlaveAJAXWidget(master_id='cycles',
+    #     endpoint='/coursespercyclemodelview/api/column/add/courses_per_cycle?_flt_0_cycle_id={{cycle_id}}'))
+    #     }
     
 
     col_list = all_fields(CoursesPerCycle)
     # print (col_list)
     # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
-    # col_list = ['cycles','courses',  'course_start_date', 'course_end_date']
+    col_list = ['cycles','courses',  'course_start_date', 'course_end_date']
     # col_list = ['cycles','courses_in_cycle',  'course_start_date', 'course_end_date']
-    col_list = ['course_start_date', 'course_end_date']
-    # add_columns = col_list.copy()
-    add_columns = ['cycles','courses_in_cycle',  'course_start_date', 'course_end_date']
+    # col_list = ['course_start_date', 'course_end_date']
+    add_columns = col_list.copy()
+    # add_columns = ['cycles','courses_in_cycle',  'course_start_date', 'course_end_date']
     list_columns = col_list.copy() 
     edit_columns = col_list.copy()
     show_columns = col_list.copy()
+
     # extra filed validation
     validators_columns = {
-        'course_end_date':[check_date_range('course_start_date', message=None)],
+        'courses':[check_unique_course_cycle(datamodel),],  # temp until fixing AJAX Select2 fields
+        'course_end_date':[check_date_range('course_start_date', message=None), 
+                           check_course_cycle_dates()],
         'vacation_end_date':[check_date_range('vacation_start_date')],
     }
+    
     
     def pre_add(self, rec: Any) -> None:
         rec.course_id = rec.courses.course_id
@@ -253,4 +257,6 @@ appbuilder.add_view(CoursesModelView, "Courses", icon="fa-envelope", category="L
 appbuilder.add_view(CoursesPerCycleModelView, "Courses per Cycle", icon="fa-envelope", category="LMS")
 appbuilder.add_view(ClassesModelView, "Classes", icon="fa-envelope", category="LMS")
 appbuilder.add_view(TeachersPerCourseModelView, "Teachers Per Course", icon="fa-envelope", category="LMS")
-appbuilder.add_api(ExampleApi)
+# appbuilder.add_api(ExampleApi)
+# appbuilder.add_api(DBWithCompoundKey)
+# appbuilder.add_api(TestModelApi)

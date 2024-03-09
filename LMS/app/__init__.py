@@ -15,6 +15,8 @@ app.config.from_object("config")
 db = SQLA(app)
 appbuilder = AppBuilder(app, db.session)
 # appbuilder = AppBuilder(app, db.session, base_template='yjbase.html')
+app.testing = True
+test_client = app.test_client()
 
 
 #"""
