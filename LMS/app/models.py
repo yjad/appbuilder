@@ -9,7 +9,7 @@ from flask_appbuilder.security.sqla.models import User
 # https://www.vertabelo.com/blog/database-design-management-system/
     
 class Courses(Model):
-    course_id = Column(String(10),  nullable=False, primary_key= True)
+    course_id = Column(String(10),  nullable=False, primary_key= True, unique=True)
     category_id = Column(String(10), ForeignKey('categories.category_id'), nullable=False,)
     categories = relationship('Categories')
 
@@ -22,14 +22,14 @@ class Courses(Model):
         return f"{self.course_id}-{self.course_description}"
 
 class Categories(Model):
-    category_id = Column(String(10), nullable=False, primary_key= True)
+    category_id = Column(String(10), nullable=False, primary_key= True, unique=True)
     category_description = Column(String(100), nullable = False)
     def __repr__(self):
         return f"{self.category_id}-{self.category_description}"
     
     
 class Cycles(Model):
-    cycle_id = Column(String(10), nullable=False, primary_key= True)
+    cycle_id = Column(String(10), nullable=False, primary_key= True, unique=True)
     cycle_description = Column(String(100),  nullable=False)
     cycle_start_date = Column(Date(),  nullable=False)
     cycle_end_date = Column(Date(),  nullable=False)
@@ -40,9 +40,9 @@ class Cycles(Model):
 
         
 class CoursesPerCycle(Model):
-    cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True)
+    cycle_id = Column(String(10), ForeignKey('cycles.cycle_id'), nullable=False, primary_key= True, unique=True)
     cycles = relationship('Cycles')
-    course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True)
+    course_id = Column(String(10), ForeignKey('courses.course_id'), nullable=False, primary_key= True, unique=True)
     courses = relationship('Courses')
 
     course_start_date = Column(Date(),  nullable=False)
@@ -53,7 +53,7 @@ class CoursesPerCycle(Model):
 
 
 class Students(Model):
-    student_id = Column(String(10), nullable=False, primary_key= True)
+    student_id = Column(String(10), nullable=False, primary_key= True, unique=True)
     student_name = Column(String(100),  nullable=False)
     email = Column(String(100),  nullable=False, unique = True)
     birth_date = Column(Date(),  nullable=False)
@@ -89,7 +89,7 @@ class Enrollments(Model):
 
 
 class Teachers(Model):
-    teacher_id = Column(String(10), nullable=False, primary_key= True)
+    teacher_id = Column(String(10), nullable=False, primary_key= True, unique=True)
     teacher_name = Column(String(100),  nullable=False)
     email = Column(String(100),  nullable=False, unique = True)
     phone = Column(String(11),  nullable=False)

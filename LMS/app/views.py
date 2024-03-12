@@ -11,8 +11,8 @@ from flask_appbuilder.actions import action
 
 from . import appbuilder, db
 from .models import Students, Teachers, Categories, Courses, Cycles, CoursesPerCycle, Enrollments, Classes, TeachersPerCourse
-# from wtforms.validators import ValidationError #, DataRequired, Email, EqualTo, Length
-from .formVal import check_date_range, check_course_cycle_dates, check_unique_course_cycle
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from .formVal import check_date_range, check_course_cycle_dates, check_unique_course_cycle, check_unique_compund_pk
 from .api import TestModelApi, ExampleApi
 
 db.create_all()
@@ -129,12 +129,13 @@ class CoursesPerCycleModelView(ModelView):
     edit_columns = col_list.copy()
     show_columns = col_list.copy()
 
-    # extra filed validation
+    # FE fieldd validation
     validators_columns = {
-        'courses':[check_unique_course_cycle(datamodel),],  # temp until fixing AJAX Select2 fields
-        'course_end_date':[check_date_range('course_start_date', message=None), 
-                           check_course_cycle_dates()],
-        'vacation_end_date':[check_date_range('vacation_start_date')],
+        # 'courses':[check_unique_course_cycle(datamodel),],  # temp until fixing AJAX Select2 fields
+        'courses':[check_unique_compund_pk(datamodel, {'cycles':'cycle_id', 'courses':'course_id'}),],  # temp until fixing AJAX Select2 fields
+        'course_end_date':[DataRequired(),                
+            check_date_range('course_start_date', message=None), check_course_cycle_dates()],
+        'vacation_end_date':[DataRequired(), check_date_range('vacation_start_date')],
     }
     
     
@@ -202,11 +203,15 @@ class ClassesModelView(ModelView):
     # col_list = all_fields(Classes)
     # print (col_list)
     col_list = ['cycles', 'courses', 'class_no', 'class_title', 'teachers',  'start_date', 'end_date']
-    # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...
+    # hide mandatory/foreign keys not null field from entry and then feed it in form pre/...
     add_columns = col_list.copy()
     list_columns = col_list.copy()
     edit_columns =  col_list.copy()
     show_columns = col_list.copy()
+
+    validators_columns = {
+        'end_date':[check_date_range('start_date')]
+    }
 
     def pre_add(self, rec: Any) -> None:
         rec.course_id = rec.courses.course_id
@@ -225,6 +230,11 @@ class TeachersPerCourseModelView(ModelView):
     datamodel = SQLAInterface(TeachersPerCourse)
 
     col_list = all_fields(TeachersPerCourse)
+    # FE field validation
+    validators_columns = {
+        'teachers':[check_unique_compund_pk(datamodel, {'cycles':'cycle_id', 'courses':'course_id', 'teachers':'teacher_id'}),], 
+    }
+
     # print (col_list)
     # col_list = ['cycles', 'courses', 'class_no', 'class_title', 'teachers',  'start_date', 'end_date']
     # # hide mandatory/foreign keys not null field from entry and then feed it in from pre/...

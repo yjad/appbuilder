@@ -50,8 +50,40 @@ class CheckUniqueCourseCycle(object):  # multi-field key
         
 check_unique_course_cycle = CheckUniqueCourseCycle
 
+# Generic compund key validation
+class CheckUniqueCompoundPK(object):  
+    def __init__(self,  datamodel, pk_field_dict, message=None):
+        self.datamodel = datamodel
+        self.pk_field_dict = pk_field_dict
+        if not message:
+            self.message = "Record's Key Already exist ..."
+        else:
+            self.message = message
 
-#TODO: to be completed
+
+    def __call__(self, form, field):
+        if '_id' in form.__dict__.keys(): # Edit Mode, don't check. _id = ['1', "MATH101"]
+            return
+        
+        # Add Mode
+        # pk_fields_dict format : {'form_field':'db_field_name'}
+        if type(self.pk_field_dict) != dict:
+            raise ValidationError("Invalid PK fields dict: {'form_field':'db_field_name')")
+        pk = []
+        for k,d in self.pk_field_dict.items():
+            if not d:       # field is not combo, just text 
+                pk =pk.append(str(form[k].data))    
+            else:
+                pk.append(getattr(form[k].data, d)) # field is a combo
+        # result = self.datamodel.get(id=(form['cycles'].data.cycle_id, form['courses'].data.course_id), filters=None)
+        result = self.datamodel.get(id=pk, filters=None)
+        if result:
+            raise ValidationError(self.message)
+        
+check_unique_compund_pk = CheckUniqueCompoundPK
+
+
+#TODO: to be completed 
 # class ValidateByEndPoint(object):
 #     def __init__(self, endpoint, message=None):
 #         if not message:
